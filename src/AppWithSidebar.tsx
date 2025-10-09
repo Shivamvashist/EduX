@@ -5,7 +5,7 @@ import { OnboardingFlow } from './components/onboarding';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from './components/AppSidebar';
 import { TopBar } from './components/TopBar';
-import { DashboardPage } from './components/pages/DashboardPage';
+import DashboardPage from './components/pages/DashboardPage';
 import { CoursesPage } from './components/pages/CoursesPage';
 import { SkillAnalysisPage } from './components/pages/SkillAnalysisPage';
 import { RedemptionPage } from './components/pages/RedemptionPage';

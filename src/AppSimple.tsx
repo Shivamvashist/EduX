@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ThemeProvider } from './components/ThemeProvider';
-import { DashboardPage } from './components/pages/DashboardPage';
+import DashboardPage from './components/pages/DashboardPage';
 import { CoursesPage } from './components/pages/CoursesPage';
 import { SkillAnalysisPage } from './components/pages/SkillAnalysisPage';
 import { RedemptionPage } from './components/pages/RedemptionPage';

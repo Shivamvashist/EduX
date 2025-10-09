@@ -1,266 +1,372 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { PlayIcon, BookmarkIcon, ClockIcon, CheckCircledIcon } from '@radix-ui/react-icons';
+import { ChevronLeft, ChevronRight, Play, Clock, Users, Star, Gift, Zap } from 'lucide-react';
+import CourseDetails from './CourseDetails';
+import WeekDetails from './WeekDetails';
+import QuestContent from './QuestContent';
+import CourseCompletion from './CourseCompletion';
+import MentorsPage from './MentorsPage';
+import ChatPage from './ChatPage';
+
+type ViewType = 'courses' | 'course-details' | 'week-details' | 'quest-content' | 'completion' | 'mentors' | 'chat';
 
 const CoursesPage: React.FC = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentView, setCurrentView] = useState<ViewType>('courses');
+  const [selectedCourse, setSelectedCourse] = useState<number | null>(null);
+  const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
+  const [selectedQuest, setSelectedQuest] = useState<number | null>(null);
+  const [selectedMentor, setSelectedMentor] = useState<{ id: number; type: string } | null>(null);
+
   const courses = [
     {
       id: 1,
-      title: 'Advanced React Development',
-      description: 'Master React hooks, context, and performance optimization',
-      progress: 75,
+      title: 'Galactic React Mastery',
+      description: 'Journey through the React universe and master component galaxies, hook nebulas, and state management constellations.',
+      image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=600&fit=crop&crop=center',
       duration: '12 hours',
-      lessons: 24,
-      category: 'Frontend',
+      students: '2.4k',
       difficulty: 'Advanced',
-      thumbnail: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=300&h=200&fit=crop&crop=center',
-      instructor: 'Sarah Chen',
-      enrolled: true
+      rating: 4.9,
+      rewards: {
+        xp: 850,
+        mystery: 'Legendary React Toolkit'
+      },
+      category: 'Frontend',
+      instructor: 'Captain Sarah Chen'
     },
     {
       id: 2,
-      title: 'Machine Learning Fundamentals',
-      description: 'Learn the basics of ML algorithms and data science',
-      progress: 30,
+      title: 'AI Neural Networks',
+      description: 'Unlock the secrets of artificial intelligence and train neural networks that can think, learn, and evolve.',
+      image: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=600&fit=crop&crop=center',
       duration: '18 hours',
-      lessons: 32,
-      category: 'Data Science',
-      difficulty: 'Intermediate',
-      thumbnail: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=300&h=200&fit=crop&crop=center',
-      instructor: 'Dr. Alex Kumar',
-      enrolled: true
+      students: '1.8k',
+      difficulty: 'Expert',
+      rating: 4.8,
+      rewards: {
+        xp: 1200,
+        mystery: 'AI Commander Badge'
+      },
+      category: 'AI/ML',
+      instructor: 'Dr. Alex Kumar'
     },
     {
       id: 3,
-      title: 'UX/UI Design Principles',
-      description: 'Create beautiful and intuitive user experiences',
-      progress: 0,
+      title: 'Design Universe Explorer',
+      description: 'Navigate the infinite cosmos of user experience and create interfaces that transcend dimensions.',
+      image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=600&fit=crop&crop=center',
       duration: '15 hours',
-      lessons: 28,
+      students: '3.2k',
+      difficulty: 'Intermediate',
+      rating: 4.7,
+      rewards: {
+        xp: 650,
+        mystery: 'Design Mastery Kit'
+      },
       category: 'Design',
-      difficulty: 'Beginner',
-      thumbnail: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=300&h=200&fit=crop&crop=center',
-      instructor: 'Maya Rodriguez',
-      enrolled: false
+      instructor: 'Commander Maya'
     },
     {
       id: 4,
-      title: 'Node.js Backend Development',
-      description: 'Build scalable server-side applications with Node.js',
-      progress: 0,
+      title: 'Backend Space Station',
+      description: 'Build and maintain powerful backend infrastructures that can handle intergalactic traffic and data flows.',
+      image: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=400&h=600&fit=crop&crop=center',
       duration: '20 hours',
-      lessons: 35,
+      students: '1.9k',
+      difficulty: 'Advanced',
+      rating: 4.8,
+      rewards: {
+        xp: 950,
+        mystery: 'Server Admiral Rank'
+      },
       category: 'Backend',
+      instructor: 'Admiral James'
+    },
+    {
+      id: 5,
+      title: 'Quantum Mobile Development',
+      description: 'Master the art of creating mobile applications that work across multiple dimensions and platforms.',
+      image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=600&fit=crop&crop=center',
+      duration: '16 hours',
+      students: '2.1k',
       difficulty: 'Intermediate',
-      thumbnail: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=300&h=200&fit=crop&crop=center',
-      instructor: 'James Wilson',
-      enrolled: false
+      rating: 4.6,
+      rewards: {
+        xp: 750,
+        mystery: 'Mobile Pioneer Certificate'
+      },
+      category: 'Mobile',
+      instructor: 'Navigator Lisa'
     }
   ];
 
-  const categories = ['All', 'Frontend', 'Backend', 'Data Science', 'Design', 'Mobile'];
-  const [selectedCategory, setSelectedCategory] = React.useState('All');
-
-  const filteredCourses = selectedCategory === 'All' 
-    ? courses 
-    : courses.filter(course => course.category === selectedCategory);
-
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'Beginner': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
-      case 'Intermediate': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
-      case 'Advanced': return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
+      case 'Beginner': return 'from-green-400 to-green-600';
+      case 'Intermediate': return 'from-yellow-400 to-orange-500';
+      case 'Advanced': return 'from-red-400 to-pink-600';
+      case 'Expert': return 'from-purple-500 to-indigo-600';
+      default: return 'from-gray-400 to-gray-600';
     }
   };
 
+  const nextCourse = () => {
+    setCurrentIndex((prev) => (prev + 1) % courses.length);
+  };
+
+  const prevCourse = () => {
+    setCurrentIndex((prev) => (prev - 1 + courses.length) % courses.length);
+  };
+
+  const currentCourse = courses[currentIndex];
+
+  // Navigation handlers
+  const handleLaunchMission = () => {
+    setSelectedCourse(currentCourse.id);
+    setCurrentView('course-details');
+  };
+
+  const handleStartWeek = (weekId: number) => {
+    setSelectedWeek(weekId);
+    setCurrentView('week-details');
+  };
+
+  const handleStartQuest = (questId: number) => {
+    setSelectedQuest(questId);
+    setCurrentView('quest-content');
+  };
+
+  const handleCompleteQuest = () => {
+    // Logic for quest completion
+    setCurrentView('week-details'); // Return to week view
+  };
+
+  const handleCourseComplete = () => {
+    setCurrentView('completion');
+  };
+
+  const handleStartChat = (mentorId: number, mentorType: string) => {
+    setSelectedMentor({ id: mentorId, type: mentorType });
+    setCurrentView('chat');
+  };
+
+  const handleBackToView = (view: ViewType) => {
+    setCurrentView(view);
+  };
+
+  // Render different views
+  if (currentView === 'course-details' && selectedCourse) {
+    return (
+      <CourseDetails
+        courseId={selectedCourse}
+        onBack={() => setCurrentView('courses')}
+        onStartWeek={handleStartWeek}
+      />
+    );
+  }
+
+  if (currentView === 'week-details' && selectedWeek) {
+    return (
+      <WeekDetails
+        weekId={selectedWeek}
+        courseId={selectedCourse || 1}
+        onBack={() => setCurrentView('course-details')}
+        onStartQuest={handleStartQuest}
+      />
+    );
+  }
+
+  if (currentView === 'quest-content' && selectedQuest) {
+    return (
+      <QuestContent
+        questId={selectedQuest}
+        weekId={selectedWeek || 1}
+        onBack={() => setCurrentView('week-details')}
+        onComplete={handleCompleteQuest}
+      />
+    );
+  }
+
+  if (currentView === 'completion') {
+    return (
+      <CourseCompletion
+        courseTitle={currentCourse.title}
+        totalXP={850}
+        completedWeeks={8}
+        totalQuests={45}
+        onReturnHome={() => setCurrentView('courses')}
+        onViewCertificate={() => console.log('View certificate')}
+      />
+    );
+  }
+
+  if (currentView === 'mentors') {
+    return (
+      <MentorsPage
+        onStartChat={handleStartChat}
+      />
+    );
+  }
+
+  if (currentView === 'chat' && selectedMentor) {
+    return (
+      <ChatPage
+        mentorId={selectedMentor.id}
+        mentorType={selectedMentor.type}
+        onBack={() => setCurrentView('mentors')}
+      />
+    );
+  }
+
   return (
-    <div className="space-y-8">
+    <div className="h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-20 left-20 w-40 h-40 bg-gray-600 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-20 w-60 h-60 bg-gray-500 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gray-400 rounded-full blur-3xl"></div>
+      </div>
+
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          My Courses
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300">
-          Continue learning and discover new skills
-        </p>
+      <div className="absolute top-0 left-0 right-0 z-10 p-8">
+        <div className="flex justify-between items-center">
+          <div></div> {/* Spacer */}
+          <div className="text-center">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-300 via-white to-gray-300 bg-clip-text text-transparent mb-2">
+              LEARNING GALAXY
+            </h1>
+            <p className="text-gray-300 text-lg">Choose Your Next Adventure</p>
+          </div>
+          <button
+            onClick={() => setCurrentView('mentors')}
+            className="px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-300 font-medium border border-gray-500"
+          >
+            Mentors
+          </button>
+        </div>
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Enrolled</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">2</p>
-            </div>
-            <BookmarkIcon className="h-8 w-8 text-blue-500" />
-          </div>
-        </motion.div>
+      {/* Navigation Controls */}
+      <button
+        onClick={prevCourse}
+        className="absolute left-8 top-1/2 transform -translate-y-1/2 z-20 w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300"
+      >
+        <ChevronLeft size={28} />
+      </button>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Completed</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">0</p>
-            </div>
-            <CheckCircledIcon className="h-8 w-8 text-green-500" />
-          </div>
-        </motion.div>
+      <button
+        onClick={nextCourse}
+        className="absolute right-8 top-1/2 transform -translate-y-1/2 z-20 w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300"
+      >
+        <ChevronRight size={28} />
+      </button>
 
+      {/* Main Course Display */}
+      <div className="flex items-center justify-center h-full pt-24 pb-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+          key={currentIndex}
+          initial={{ opacity: 0, scale: 0.8, y: 50 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.8, y: -50 }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
+          className="text-center space-y-8 max-w-2xl px-8"
         >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Hours Learned</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">42</p>
+          {/* Course Image */}
+          <div className="relative">
+            <div className="w-80 h-72 mx-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20">
+              <img
+                src={currentCourse.image}
+                alt={currentCourse.title}
+                className="w-full h-full object-cover"
+              />
+              
+              
             </div>
-            <ClockIcon className="h-8 w-8 text-purple-500" />
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Avg. Progress</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">52%</p>
+            <div className='flex flex-row gap-2'>
+                <div className="flex items-center gap-1 bg-black/50 backdrop-blur-sm px-2 py-1 rounded-full">
+                  <Star size={12} className="text-yellow-400 fill-current" />
+                  <span className="text-white text-xs font-medium">{currentCourse.rating}</span>
+                </div>
+                <div className={`px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${getDifficultyColor(currentCourse.difficulty)}`}>
+                  {currentCourse.difficulty}
+                </div>
             </div>
-            <PlayIcon className="h-8 w-8 text-orange-500" />
           </div>
-        </motion.div>
-      </div>
 
-      {/* Category Filter */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {categories.map((category) => (
+          {/* Course Title */}
+          <h2 className="text-3xl font-bold text-white mb-2">
+            {currentCourse.title}
+          </h2>
+
+          {/* Course Description */}
+          <p className="text-blue-200 text-lg leading-relaxed mb-6">
+            {currentCourse.description}
+          </p>
+
+          {/* Course Stats */}
+          <div className="flex justify-center gap-8 mb-8">
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+              <Clock size={16} className="text-blue-400" />
+              <span className="text-white text-sm">{currentCourse.duration}</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+              <Users size={16} className="text-green-400" />
+              <span className="text-white text-sm">{currentCourse.students}</span>
+            </div>
+            <div className="text-white text-sm bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+              by {currentCourse.instructor}
+            </div>
+          </div>
+
+          {/* Rewards Section */}
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 mb-8">
+            <h3 className="text-white font-semibold mb-4 flex items-center justify-center gap-2">
+              <Gift size={20} className="text-yellow-400" />
+              Mission Rewards
+            </h3>
+            <div className="flex justify-center gap-6">
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <Zap size={16} className="text-yellow-400" />
+                  <span className="text-2xl font-bold text-yellow-400">+{currentCourse.rewards.xp}</span>
+                </div>
+                <p className="text-blue-200 text-xs">Experience Points</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <div className="text-2xl">🎁</div>
+                </div>
+                <p className="text-blue-200 text-xs">{currentCourse.rewards.mystery}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Start Course Button */}
           <motion.button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
+            onClick={handleLaunchMission}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-colors ${
-              selectedCategory === category
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-            }`}
+            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-12 rounded-full text-lg shadow-2xl border border-white/20 flex items-center justify-center gap-3 mx-auto transition-all duration-300"
           >
-            {category}
+            <Play size={20} fill="currentColor" />
+            Launch Mission
           </motion.button>
-        ))}
+        </motion.div>
       </div>
 
-      {/* Courses Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCourses.map((course, index) => (
-          <motion.div
-            key={course.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow group cursor-pointer"
-          >
-            {/* Course Thumbnail */}
-            <div className="relative h-48 overflow-hidden">
-              <img
-                src={course.thumbnail}
-                alt={course.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              {course.enrolled && course.progress > 0 && (
-                <div className="absolute top-4 left-4">
-                  <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                    In Progress
-                  </span>
-                </div>
-              )}
-              {!course.enrolled && (
-                <div className="absolute top-4 left-4">
-                  <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                    Available
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Course Content */}
-            <div className="p-6">
-              <div className="flex items-center gap-2 mb-2">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(course.difficulty)}`}>
-                  {course.difficulty}
-                </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">{course.category}</span>
-              </div>
-
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-500 transition-colors">
-                {course.title}
-              </h3>
-
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
-                {course.description}
-              </p>
-
-              <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-4">
-                <div className="flex items-center gap-1">
-                  <ClockIcon className="h-3 w-3" />
-                  {course.duration}
-                </div>
-                <div className="flex items-center gap-1">
-                  <PlayIcon className="h-3 w-3" />
-                  {course.lessons} lessons
-                </div>
-              </div>
-
-              {course.enrolled && course.progress > 0 && (
-                <div className="mb-4">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs text-gray-600 dark:text-gray-300">Progress</span>
-                    <span className="text-xs text-gray-600 dark:text-gray-300">{course.progress}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div
-                      className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${course.progress}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-300">
-                  by {course.instructor}
-                </span>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    course.enrolled
-                      ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                      : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300'
-                  }`}
-                >
-                  {course.enrolled ? (course.progress > 0 ? 'Continue' : 'Start') : 'Enroll'}
-                </motion.button>
-              </div>
-            </div>
-          </motion.div>
+      {/* Course Indicators */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3">
+        {courses.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              index === currentIndex
+                ? 'bg-white scale-125'
+                : 'bg-white/30 hover:bg-white/50'
+            }`}
+          />
         ))}
       </div>
     </div>

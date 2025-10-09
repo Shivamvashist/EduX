@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ThemeProvider } from './components/ThemeProvider';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { OnboardingFlow } from './components/onboarding';
-import { DashboardPage } from './components/pages/DashboardPage';
+import DashboardPage from './components/pages/DashboardPage';
 import { CoursesPage } from './components/pages/CoursesPage';
 import { SkillAnalysisPage } from './components/pages/SkillAnalysisPage';
 import { RedemptionPage } from './components/pages/RedemptionPage';
@@ -13,7 +13,7 @@ type AppView = 'landing' | 'onboarding' | 'main';
 type MainTab = 'dashboard' | 'courses' | 'skill-analysis' | 'redemption' | 'rewards';
 
 function AppContent() {
-  const [currentView, setCurrentView] = useState<AppView>('landing');
+  const [currentView, setCurrentView] = useState<AppView>('main');
   const [activeTab, setActiveTab] = useState<MainTab>('dashboard');
 
   const handleStartOnboarding = () => {
@@ -28,10 +28,15 @@ function AppContent() {
     setCurrentView('main');
   };
 
+  const handleBackToOnboarding = () => {
+    console.log('🚀 handleBackToOnboarding clicked! Switching to onboarding view...');
+    setCurrentView('onboarding');
+  };
+
   const renderPageContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <DashboardPage />;
+        return <DashboardPage onBackToOnboarding={handleBackToOnboarding} />;
       case 'courses':
         return <CoursesPage />;
       case 'skill-analysis':
@@ -41,7 +46,7 @@ function AppContent() {
       case 'rewards':
         return <RewardsPage />;
       default:
-        return <DashboardPage />;
+        return <DashboardPage onBackToOnboarding={handleBackToOnboarding} />;
     }
   };
 
